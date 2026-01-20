@@ -112,35 +112,28 @@ export default function Home() {
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
 
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: "",
-        displayedContent: "",
-        isTyping: true,
-      };
+      const assistantMessageId = (Date.now() + 1).toString();
+      let fullContent = "";
 
-      setMessages((prev) => [...prev, assistantMessage]);
-
-      // Stream LLM response (collect full text, don't show yet)
+      // Stream LLM response (collect full text, don't show yet - just show typing indicator)
       if (reader) {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
           const chunk = decoder.decode(value);
-          assistantMessage.content += chunk;
+          fullContent += chunk;
         }
       }
 
       // Now get TTS and sync typing with audio
-      if (assistantMessage.content) {
+      if (fullContent) {
         try {
           const ttsResponse = await fetch("/api/tts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              text: assistantMessage.content,
+              text: fullContent,
               language,
             }),
           });
@@ -157,21 +150,20 @@ export default function Home() {
             audio.addEventListener("loadedmetadata", () => {
               const durationMs = audio.duration * 1000;
 
-              // Reset displayed content and start typing effect
-              setMessages((prev) =>
-                prev.map((m) =>
-                  m.id === assistantMessage.id
-                    ? { ...m, displayedContent: "", isTyping: true }
-                    : m
-                )
-              );
+              // Hide typing indicator and add the message
+              setIsLoading(false);
+
+              const assistantMessage: Message = {
+                id: assistantMessageId,
+                role: "assistant",
+                content: fullContent,
+                displayedContent: "",
+                isTyping: true,
+              };
+              setMessages((prev) => [...prev, assistantMessage]);
 
               // Start typing and audio simultaneously
-              startTypingEffect(
-                assistantMessage.id,
-                assistantMessage.content,
-                durationMs
-              );
+              startTypingEffect(assistantMessageId, fullContent, durationMs);
               audio.play().catch(console.error);
             });
 
@@ -179,10 +171,10 @@ export default function Home() {
             audio.addEventListener("ended", () => {
               setMessages((prev) =>
                 prev.map((m) =>
-                  m.id === assistantMessage.id
+                  m.id === assistantMessageId
                     ? {
                         ...m,
-                        displayedContent: assistantMessage.content,
+                        displayedContent: fullContent,
                         isTyping: false,
                       }
                     : m
@@ -191,13 +183,35 @@ export default function Home() {
             });
 
             audio.load();
+          } else {
+            // TTS failed - show message without audio
+            setIsLoading(false);
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: assistantMessageId,
+                role: "assistant",
+                content: fullContent,
+              },
+            ]);
           }
         } catch (ttsError) {
           console.error("TTS error:", ttsError);
+          // TTS failed - show message without audio
+          setIsLoading(false);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: assistantMessageId,
+              role: "assistant",
+              content: fullContent,
+            },
+          ]);
         }
       }
     } catch (error) {
       console.error("Error:", error);
+      setIsLoading(false);
       setMessages((prev) => [
         ...prev,
         {
@@ -206,8 +220,6 @@ export default function Home() {
           content: "죄송합니다. 응답을 생성하는 중 오류가 발생했습니다.",
         },
       ]);
-    } finally {
-      setIsLoading(false);
     }
   };
 
