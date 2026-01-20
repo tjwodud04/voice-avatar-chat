@@ -30,11 +30,6 @@ Got any questions? Fire away!`,
   },
 };
 
-const TITLES: Record<Language, string> = {
-  ko: "안녕하세요, 저는 재영입니다!",
-  en: "Hey, I'm Jae Young — AMA!",
-};
-
 export default function Home() {
   const [language, setLanguage] = useState<Language>("ko");
   const [messages, setMessages] = useState<Message[]>([INTRO_MESSAGES.ko]);
@@ -226,15 +221,11 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-950">
-        <div className="mx-auto flex max-w-2xl items-center justify-between">
-          <div className="w-12" />
-          <h1 className="text-center text-lg font-semibold text-gray-900 dark:text-white">
-            {TITLES[language]}
-          </h1>
+      <header className="border-b border-gray-200 bg-white px-4 py-2 dark:border-gray-800 dark:bg-gray-950">
+        <div className="mx-auto flex max-w-2xl justify-end">
           <button
             onClick={toggleLanguage}
-            className="w-12 rounded-md px-2 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+            className="rounded-md px-2 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
           >
             {language === "ko" ? "EN" : "KO"}
           </button>
