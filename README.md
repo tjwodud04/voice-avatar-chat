@@ -55,7 +55,7 @@ npm run dev
 ### Voice Setup
 
 1. Create a cloned voice on ElevenLabs
-2. Update Voice IDs in `app/api/tts/route.ts`:
+2. Update Voice IDs in `lib/config.ts` (or override via `ELEVENLABS_VOICE_ID_KO` / `ELEVENLABS_VOICE_ID_EN` env vars):
 ```typescript
 const VOICE_IDS = {
   ko: "your-korean-voice-id",
@@ -129,7 +129,7 @@ npm run dev
 ### Voice 설정
 
 1. ElevenLabs에서 Voice Cloning 생성
-2. `app/api/tts/route.ts`에서 Voice ID 수정:
+2. `lib/config.ts`에서 Voice ID 수정 (또는 `ELEVENLABS_VOICE_ID_KO` / `ELEVENLABS_VOICE_ID_EN` 환경변수로 재정의):
 ```typescript
 const VOICE_IDS = {
   ko: "your-korean-voice-id",

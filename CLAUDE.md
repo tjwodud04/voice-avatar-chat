@@ -30,7 +30,8 @@ voice_self_intro/
 │   ├── TypingIndicator.tsx
 │   └── SampleQuestions.tsx
 ├── lib/
-│   └── knowledge.ts          # Knowledge loader + system prompt
+│   ├── knowledge.ts          # Knowledge loader + system prompt
+│   └── config.ts             # Service config/constants (model + voice IDs)
 ├── knowledge/                # Knowledge base (markdown)
 │   ├── profile.md
 │   ├── resume.md
@@ -60,7 +61,7 @@ ELEVENLABS_API_KEY=         # https://elevenlabs.io
 ## Voice IDs (ElevenLabs)
 
 ```typescript
-// app/api/tts/route.ts
+// lib/config.ts (override per deployment via ELEVENLABS_VOICE_ID_KO / _EN)
 const VOICE_IDS = {
   ko: "LD5VPAjxmMpdmJU1Oept",  // Korean cloned voice
   en: "Xv5zYcc8R8aVmTK2C2Y9",  // English cloned voice

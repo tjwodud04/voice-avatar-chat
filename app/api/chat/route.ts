@@ -1,6 +1,7 @@
 import { streamText } from "ai";
 import { createGroq } from "@ai-sdk/groq";
 import { loadKnowledgeBase, buildSystemPrompt } from "@/lib/knowledge";
+import { GROQ_MODEL } from "@/lib/config";
 
 const groq = createGroq({
   apiKey: process.env.GROQ_API_KEY,
@@ -15,7 +16,7 @@ export async function POST(req: Request) {
     const systemPrompt = buildSystemPrompt(knowledge);
 
     const result = streamText({
-      model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+      model: groq(GROQ_MODEL),
       system: systemPrompt,
       messages,
     });

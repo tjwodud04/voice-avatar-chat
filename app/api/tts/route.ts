@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-
-// ElevenLabs API
-const ELEVENLABS_API_URL = "https://api.elevenlabs.io/v1/text-to-speech";
-
-// Voice IDs for cloned voices
-const VOICE_IDS: Record<string, string> = {
-  ko: "LD5VPAjxmMpdmJU1Oept",
-  en: "Xv5zYcc8R8aVmTK2C2Y9",
-};
+import {
+  DEFAULT_LANGUAGE,
+  ELEVENLABS_MODEL_ID,
+  ELEVENLABS_TTS_URL,
+  VOICE_IDS,
+  VOICE_SETTINGS,
+} from "@/lib/config";
 
 export async function POST(req: NextRequest) {
   try {
-    const { text, language = "ko" } = await req.json();
+    const { text, language = DEFAULT_LANGUAGE } = await req.json();
 
     if (!text || typeof text !== "string") {
       return NextResponse.json({ error: "Text is required" }, { status: 400 });
@@ -25,9 +23,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const voiceId = VOICE_IDS[language] || VOICE_IDS.ko;
+    const voiceId = VOICE_IDS[language] || VOICE_IDS[DEFAULT_LANGUAGE];
 
-    const response = await fetch(`${ELEVENLABS_API_URL}/${voiceId}`, {
+    const response = await fetch(`${ELEVENLABS_TTS_URL}/${voiceId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -35,13 +33,8 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         text,
-        model_id: "eleven_multilingual_v2",
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-          style: 0.0,
-          use_speaker_boost: true,
-        },
+        model_id: ELEVENLABS_MODEL_ID,
+        voice_settings: VOICE_SETTINGS,
       }),
     });
 
